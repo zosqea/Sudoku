@@ -1,4 +1,4 @@
-var _a, _b;
+var _a, _b, _c;
 var size = 9;
 var symbol = '1';
 var divBoard = document.createElement('div');
@@ -16,23 +16,27 @@ var _loop_1 = function (i) {
     tempTd.innerText = i + '';
     choseSymbolTableTr.append(tempTd);
     tempTd.onclick = function (ev) {
+        var _a, _b;
         symbol = i + '';
-        // for (let j = 0; j < size; j++) {
-        //   if(j%2==1) document.getElementById(`chose${j}`)!.setAttribute('style','background-color: aquamarine;');
-        //   if(j%2==0) document.getElementById(`chose${j}`)!.setAttribute('style','background-color: rgb(104, 230, 205);');
-        // }
-        // tempTd.setAttribute('style','background-color: rgb(39, 82, 67);')
+        for (var j = 1; j <= size; j++) {
+            if (j % 2 == 1)
+                (_a = document.getElementById("chose".concat(j))) === null || _a === void 0 ? void 0 : _a.setAttribute('style', 'background-color: aquamarine;');
+            if (j % 2 == 0)
+                (_b = document.getElementById("chose".concat(j))) === null || _b === void 0 ? void 0 : _b.setAttribute('style', 'background-color: rgb(104, 230, 205);');
+        }
+        tempTd.setAttribute('style', 'background-color: rgb(39, 82, 67);');
     };
     if (i % 2 == 1)
         tempTd.setAttribute('style', 'background-color: aquamarine;');
     if (i % 2 == 0)
         tempTd.setAttribute('style', 'background-color: rgb(104, 230, 205);');
+    (_b = document.getElementById('chose1')) === null || _b === void 0 ? void 0 : _b.setAttribute('style', 'background-color: rgb(39, 82, 67);');
 };
 for (var i = 1; i <= size; i++) {
     _loop_1(i);
 }
 divBoard.setAttribute('id', 'divBoard');
-(_b = document.querySelector('body')) === null || _b === void 0 ? void 0 : _b.append(divBoard);
+(_c = document.querySelector('body')) === null || _c === void 0 ? void 0 : _c.append(divBoard);
 var board = document.createElement('table');
 board.setAttribute('id', 'board');
 divBoard.append(board);

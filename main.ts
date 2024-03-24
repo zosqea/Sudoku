@@ -17,14 +17,15 @@ for (let i = 1; i <= size; i++) {
   choseSymbolTableTr.append(tempTd);
   tempTd.onclick = (ev:MouseEvent) => {
     symbol = i + '';
-    // for (let j = 0; j < size; j++) {
-    //   if(j%2==1) document.getElementById(`chose${j}`)!.setAttribute('style','background-color: aquamarine;');
-    //   if(j%2==0) document.getElementById(`chose${j}`)!.setAttribute('style','background-color: rgb(104, 230, 205);');
-    // }
-    // tempTd.setAttribute('style','background-color: rgb(39, 82, 67);')
+    for (let j = 1; j <= size; j++) {
+      if(j%2==1) document.getElementById(`chose${j}`)?.setAttribute('style','background-color: aquamarine;');
+      if(j%2==0) document.getElementById(`chose${j}`)?.setAttribute('style','background-color: rgb(104, 230, 205);');
+    }
+    tempTd.setAttribute('style','background-color: rgb(39, 82, 67);');
   }
   if(i%2==1) tempTd.setAttribute('style','background-color: aquamarine;');
   if(i%2==0) tempTd.setAttribute('style','background-color: rgb(104, 230, 205);');
+  document.getElementById('chose1')?.setAttribute('style','background-color: rgb(39, 82, 67);');
 }
 
 divBoard.setAttribute('id','divBoard');
