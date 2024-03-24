@@ -1,6 +1,7 @@
 const size:number = 9;
 let symbol:string = '1';
 let divBoard = document.createElement('div');
+window.addEventListener("contextmenu", e => e.preventDefault());
 
 let choseSymbolPanel = document.createElement('div');
 document.querySelector('body')?.append(choseSymbolPanel);
@@ -40,10 +41,26 @@ for (let i = 0; i < size; i++) {
     let tempTd = document.createElement('td');
     tempTd.setAttribute('id',`cell${i*size + j}`);
     tempTr.append(tempTd);
-    if((i*size*3+j)%2==1) tempTd.setAttribute('style','background-color: antiquewhite;');
-    if((i*size*3+j)%2==0) tempTd.setAttribute('style','background-color: rgb(248, 215, 158);');
+    if((i*size*3+j)%2==1) tempTd.setAttribute('class','oddCell');
+    if((i*size*3+j)%2==0) tempTd.setAttribute('class','evenCell');
+    if(i%3==0) tempTd.setAttribute('style', 'border-top: 2px solid black;');
+    if(j%3==0) tempTd.setAttribute('style', 'border-left: 2px solid black;');
+    if(i%3==0&&j%3==0) tempTd.setAttribute('style', 'border-top: 2px solid black; border-left: 2px solid black;');
     tempTd.onclick = (ev:MouseEvent) => {
       tempTd.innerText = symbol;
     }
+    tempTd.onmouseup = (ev:MouseEvent) => {
+      tempTd.innerText = '';
+    }
   }
+}
+
+function checkBoard(size:number):boolean{
+  for (let i = 0; i < size; i++) {
+    
+    for (let j = 0; j < size; j++) {
+      
+    }
+  }
+  return true;
 }

@@ -2,6 +2,7 @@ var _a, _b, _c;
 var size = 9;
 var symbol = '1';
 var divBoard = document.createElement('div');
+window.addEventListener("contextmenu", function (e) { return e.preventDefault(); });
 var choseSymbolPanel = document.createElement('div');
 (_a = document.querySelector('body')) === null || _a === void 0 ? void 0 : _a.append(choseSymbolPanel);
 choseSymbolPanel.setAttribute('id', 'choseSymbolPanel');
@@ -48,11 +49,20 @@ for (var i = 0; i < size; i++) {
         tempTd.setAttribute('id', "cell".concat(i * size + j));
         tempTr.append(tempTd);
         if ((i * size * 3 + j) % 2 == 1)
-            tempTd.setAttribute('style', 'background-color: antiquewhite;');
+            tempTd.setAttribute('class', 'oddCell');
         if ((i * size * 3 + j) % 2 == 0)
-            tempTd.setAttribute('style', 'background-color: rgb(248, 215, 158);');
+            tempTd.setAttribute('class', 'evenCell');
+        if (i % 3 == 0)
+            tempTd.setAttribute('style', 'border-top: 2px solid black;');
+        if (j % 3 == 0)
+            tempTd.setAttribute('style', 'border-left: 2px solid black;');
+        if (i % 3 == 0 && j % 3 == 0)
+            tempTd.setAttribute('style', 'border-top: 2px solid black; border-left: 2px solid black;');
         tempTd.onclick = function (ev) {
             tempTd.innerText = symbol;
+        };
+        tempTd.onmouseup = function (ev) {
+            tempTd.innerText = '';
         };
     };
     for (var j = 0; j < size; j++) {
