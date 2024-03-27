@@ -1,3 +1,4 @@
+"use strict";
 // import {sudoku} from "./sudoku";
 var _a, _b, _c, _d, _e;
 // export module main{
@@ -6,17 +7,12 @@ var boardArray = new Array(81);
 var size = 9;
 var symbol = 1;
 var divBoard = document.createElement('div');
-(_a = document.querySelector('body')) === null || _a === void 0 ? void 0 : _a.addEventListener("keyup", function (event) {
+(_a = document.querySelector('body')) === null || _a === void 0 ? void 0 : _a.addEventListener("keydown", function (event) {
     var _a;
     var keyCode = event.keyCode;
     if (keyCode >= 49 && keyCode <= 57) {
-        (_a = document.getElementById("chose".concat(keyCode - 48))) === null || _a === void 0 ? void 0 : _a.click();
+        (_a = document.getElementById("chose" + (keyCode - 48))) === null || _a === void 0 ? void 0 : _a.click();
     }
-    if (keyCode == 71) {
-        boardGenerateSecond();
-        displayBoard(boardArray);
-    }
-    console.log(keyCode);
 });
 var mistakesPanel = document.createElement('div');
 (_b = document.querySelector('body')) === null || _b === void 0 ? void 0 : _b.append(mistakesPanel);
@@ -34,7 +30,7 @@ var choseSymbolTableTr = document.createElement('tr');
 choseSymbolTable.append(choseSymbolTableTr);
 var _loop_1 = function (i) {
     var tempTd = document.createElement('td');
-    tempTd.setAttribute('id', "chose".concat(i));
+    tempTd.setAttribute('id', "chose" + i);
     tempTd.innerText = i + '';
     choseSymbolTableTr.append(tempTd);
     tempTd.onclick = function (ev) {
@@ -42,9 +38,9 @@ var _loop_1 = function (i) {
         symbol = i;
         for (var j = 1; j <= size; j++) {
             if (j % 2 == 1)
-                (_a = document.getElementById("chose".concat(j))) === null || _a === void 0 ? void 0 : _a.setAttribute('style', 'background-color: aquamarine;');
+                (_a = document.getElementById("chose" + j)) === null || _a === void 0 ? void 0 : _a.setAttribute('style', 'background-color: aquamarine;');
             if (j % 2 == 0)
-                (_b = document.getElementById("chose".concat(j))) === null || _b === void 0 ? void 0 : _b.setAttribute('style', 'background-color: rgb(104, 230, 205);');
+                (_b = document.getElementById("chose" + j)) === null || _b === void 0 ? void 0 : _b.setAttribute('style', 'background-color: rgb(104, 230, 205);');
         }
         tempTd.setAttribute('style', 'background-color: rgb(39, 82, 67);');
     };
@@ -67,7 +63,7 @@ var _loop_2 = function (i) {
     board.append(tempTr);
     var _loop_3 = function (j) {
         var tempTd = document.createElement('td');
-        tempTd.setAttribute('id', "cell".concat(i * size + j));
+        tempTd.setAttribute('id', "cell" + (i * size + j));
         tempTr.append(tempTd);
         if ((i * size * 3 + j) % 2 == 1)
             tempTd.setAttribute('class', 'oddCell');
@@ -98,7 +94,8 @@ var _loop_2 = function (i) {
 for (var i = 0; i < size; i++) {
     _loop_2(i);
 }
-//boardGenerateSecond();
+boardGenerateSecond();
+displayBoard(boardArray);
 function checkBoard(board, size) {
     for (var i = 0, conuterI = 1; i < size * size; i += 3, conuterI++) {
         var numbersCheck = new Array(10);
@@ -138,7 +135,7 @@ function checkAlgoritmBigCell(size) {
         for (var j = 0, counterJ = 0; j < 21; j++, counterJ++) {
             if (counterJ % 3 == 0 && counterJ != 0)
                 j += size - 3;
-            document.getElementById("cell".concat(i + j)).innerText = counter + "";
+            document.getElementById("cell" + (i + j)).innerText = counter + "";
             counter++;
         }
         if (conuterI % 3 == 0 && conuterI != 0)
@@ -149,7 +146,7 @@ function checkAlgoritmLine(size) {
     var counter = 0;
     for (var i = 0; i < size; i++) {
         for (var j = 0; j < size; j++) {
-            document.getElementById("cell".concat(j * size + i)).innerText = counter + "";
+            document.getElementById("cell" + (j * size + i)).innerText = counter + "";
             counter++;
         }
     }
@@ -157,9 +154,9 @@ function checkAlgoritmLine(size) {
 function displayBoard(boardArray) {
     for (var i = 0; i < size * size; i++) {
         if (boardArray[i] > 0)
-            document.getElementById("cell".concat(i)).innerText = boardArray[i] + "";
+            document.getElementById("cell" + i).innerText = boardArray[i] + "";
         else
-            document.getElementById("cell".concat(i)).innerText = '';
+            document.getElementById("cell" + i).innerText = '';
     }
 }
 function displayMistakes() {
@@ -196,22 +193,23 @@ function boardGenerate(board, size) {
     }
 }
 function boardGenerateSecond() {
-    console.log("Start funct");
     var exception = [];
     var randomNumberLast;
     var pointOne = 0;
     var pointTwo = 0;
-    for (var i = 0, counter = 0; i < 9; i++) {
-        exception = [];
+    for (var i = 0, counter = 0; i < size * size; i++) {
+        exception.slice(0, exception.length);
         do {
-            if (i > pointTwo && pointTwo != 0) {
+            randomNumberLast = randomBetween(0, 10, exception);
+            boardArray[i] = randomNumberLast;
+            exception.push(randomNumberLast);
+            if (i > pointTwo) {
                 pointOne = 0;
                 pointTwo = 0;
             }
             if (checkArrayExceptionSum(exception)) {
-                if (pointOne <= 0) {
+                if (pointOne == 0) {
                     pointOne = i - 2;
-                    console.log("Aboba");
                     pointTwo = i;
                 }
                 else {
@@ -219,17 +217,13 @@ function boardGenerateSecond() {
                 }
                 i = pointOne;
                 boardArray[i] = 0;
-                // console.log(exception);
+                console.log(exception);
                 break;
             }
             ;
-            randomNumberLast = randomBetween(0, 10, exception);
-            boardArray[i] = randomNumberLast;
-            exception.push(randomNumberLast);
-            //console.log(i);
+            console.log(i);
         } while (!checkBoard(boardArray, size));
     }
-    console.log('End func');
 }
 function randomBetween(min, max, exception) {
     var randomNumber;
