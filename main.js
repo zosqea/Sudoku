@@ -13,10 +13,9 @@ var divBoard = document.createElement('div');
         (_a = document.getElementById("chose".concat(keyCode - 48))) === null || _a === void 0 ? void 0 : _a.click();
     }
     if (keyCode == 71) {
-        boardGenerateSecond();
+        backtrackingSolution();
         displayBoard(boardArray);
     }
-    console.log(keyCode);
 });
 var mistakesPanel = document.createElement('div');
 (_b = document.querySelector('body')) === null || _b === void 0 ? void 0 : _b.append(mistakesPanel);
@@ -98,7 +97,6 @@ var _loop_2 = function (i) {
 for (var i = 0; i < size; i++) {
     _loop_2(i);
 }
-//boardGenerateSecond();
 function checkBoard(board, size) {
     for (var i = 0, conuterI = 1; i < size * size; i += 3, conuterI++) {
         var numbersCheck = new Array(10);
@@ -131,28 +129,6 @@ function checkBoard(board, size) {
         }
     }
     return true;
-}
-function checkAlgoritmBigCell(size) {
-    var counter = 0;
-    for (var i = 0, conuterI = 1; i < size * size; i += 3, conuterI++) {
-        for (var j = 0, counterJ = 0; j < 21; j++, counterJ++) {
-            if (counterJ % 3 == 0 && counterJ != 0)
-                j += size - 3;
-            document.getElementById("cell".concat(i + j)).innerText = counter + "";
-            counter++;
-        }
-        if (conuterI % 3 == 0 && conuterI != 0)
-            i += 18;
-    }
-}
-function checkAlgoritmLine(size) {
-    var counter = 0;
-    for (var i = 0; i < size; i++) {
-        for (var j = 0; j < size; j++) {
-            document.getElementById("cell".concat(j * size + i)).innerText = counter + "";
-            counter++;
-        }
-    }
 }
 function displayBoard(boardArray) {
     for (var i = 0; i < size * size; i++) {
@@ -252,4 +228,71 @@ function checkArrayExceptionSum(array) {
     }
     return sum == 45;
 }
-//}
+//##############################backtacking algoritm
+function backtrackingSolution() {
+    var main = new TreeNode(0);
+    var optionsOfValue;
+    var currentTreeNode = main;
+    var lastAddedValue = main;
+    for (var i = 0, counter = 0; i < size * size; i++) {
+        optionsOfValue = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        optionsOfValue = differceFillOptionsOfValue(optionsOfValue, currentTreeNode.valueOfAllChild);
+        do {
+            if (optionsOfValue.length == 0) {
+                currentTreeNode = currentTreeNode.parent;
+                boardArray[i] = 0;
+                //console.log('aboba');
+                counter++;
+                break;
+            }
+            var randomNumber = Math.floor(Math.random() * (optionsOfValue.length));
+            var randomValue = optionsOfValue[randomNumber];
+            optionsOfValue.splice(randomNumber, randomNumber);
+            boardArray[i] = randomValue;
+            lastAddedValue = new TreeNode(randomValue);
+            currentTreeNode.addChild(lastAddedValue);
+            //console.log(randomValue);
+            //console.log(optionsOfValue);
+            //console.log(randomNumber);
+        } while (!checkBoard(boardArray, size) && boardArray[i] != 0);
+        if (boardArray[i] != 0)
+            currentTreeNode = lastAddedValue;
+        else
+            i -= 2;
+        console.log(i);
+        //if(counter>=1000) board;
+        // console.log(counter);
+    }
+}
+// for (let i = 0; i < 20; i++) {
+//   console.log(Math.floor(Math.random()*(9)))
+// }
+function allBoardCheck() {
+    boardArray.forEach(function (item) {
+        if (boardArray[item] == 0)
+            return false;
+    });
+    return true;
+}
+function differceFillOptionsOfValue(array, hashset) {
+    if (hashset == undefined)
+        return array;
+    hashset.forEach(function (item) {
+        if (array.indexOf(item) != -1)
+            array.splice(array.indexOf(item), 1);
+    });
+    return array;
+}
+var TreeNode = /** @class */ (function () {
+    function TreeNode(value) {
+        this.value = value;
+        this.child = new Set();
+    }
+    TreeNode.prototype.addChild = function (child) {
+        var _a;
+        this.child.add(child);
+        (_a = this.valueOfAllChild) === null || _a === void 0 ? void 0 : _a.add(child.value);
+        child.parent = this;
+    };
+    return TreeNode;
+}());

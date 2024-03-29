@@ -13,10 +13,9 @@
       document.getElementById(`chose${keyCode-48}`)?.click();
     }
     if(keyCode==71){
-      boardGenerateSecond();
+      backtrackingSolution();
       displayBoard(boardArray);
     }
-    console.log(keyCode);
   });
 
   let mistakesPanel = document.createElement('div');
@@ -82,8 +81,6 @@
       }
     }
   }
-  //boardGenerateSecond();
-  
 
   function checkBoard(board:number[], size:number):boolean{
     for (let i = 0, conuterI = 1; i < size*size; i+=3, conuterI++) {
@@ -109,27 +106,6 @@
       }
     }
     return true;
-  }
-
-  function checkAlgoritmBigCell(size:number):void{
-    let counter:number = 0;
-    for (let i = 0, conuterI = 1; i < size*size; i+=3, conuterI++) {
-      for (let j = 0, counterJ = 0; j < 21; j++, counterJ++) {
-        if(counterJ%3==0&&counterJ!=0) j+=size - 3;
-        document.getElementById(`cell${i+j}`)!.innerText = counter + "";
-        counter++;
-      }
-      if(conuterI%3==0&&conuterI!=0) i+=18;
-    }
-  }
-  function checkAlgoritmLine(size:number):void{
-    let counter:number = 0;
-    for (let i = 0; i < size; i++) {
-      for (let j = 0; j < size; j++) {
-        document.getElementById(`cell${j*size + i}`)!.innerText = counter + "";
-        counter++;
-      }
-    }
   }
 
   function displayBoard(boardArray:number[]):void{
@@ -231,4 +207,74 @@
     }
     return sum==45;
   }
-//}
+
+  //##############################backtacking algoritm
+  function backtrackingSolution():void{
+    let main:TreeNode = new TreeNode(0);
+    let optionsOfValue:number[];
+    let currentTreeNode:TreeNode = main;
+    let lastAddedValue:TreeNode = main;
+    for (let i = 0, counter = 0; i < size*size; i++) {
+      optionsOfValue = [1,2,3,4,5,6,7,8,9];
+      optionsOfValue = differceFillOptionsOfValue(optionsOfValue, currentTreeNode.valueOfAllChild);
+      do{
+        if(optionsOfValue.length == 0){
+          currentTreeNode = currentTreeNode.parent;
+          boardArray[i] = 0;
+          //console.log('aboba');
+          counter++;
+          break;
+        }
+        let randomNumber:number = Math.floor(Math.random()*(optionsOfValue.length));
+        let randomValue:number = optionsOfValue[randomNumber];
+        optionsOfValue.splice(randomNumber,randomNumber);
+        boardArray[i] = randomValue;
+        lastAddedValue = new TreeNode(randomValue);
+        currentTreeNode.addChild(lastAddedValue);
+        //console.log(randomValue);
+        //console.log(optionsOfValue);
+        //console.log(randomNumber);
+      }while (!checkBoard(boardArray,size)&&boardArray[i]!=0);
+      if(boardArray[i]!=0) currentTreeNode = lastAddedValue;
+      else i-=2;
+      console.log(i);
+      //if(counter>=1000) board;
+      // console.log(counter);
+    }
+  }
+
+  // for (let i = 0; i < 20; i++) {
+  //   console.log(Math.floor(Math.random()*(9)))
+  // }
+  
+
+  function allBoardCheck():boolean{
+    boardArray.forEach( item => {
+      if(boardArray[item]==0) return false;
+    });
+    return true;
+  }
+
+  function differceFillOptionsOfValue(array:number[], hashset:Set<number>):number[]{
+    if(hashset == undefined) return array;
+    hashset.forEach( (item) =>{
+      if(array.indexOf(item) != -1)array.splice(array.indexOf(item),1)
+    })
+    return array;
+  }
+
+  class TreeNode{
+    child!: Set<TreeNode>;
+    parent!: TreeNode;
+    value!: number;
+    valueOfAllChild!: Set<number>;
+    constructor(value:number){
+      this.value = value;
+      this.child = new Set();
+    }
+    addChild(child:TreeNode){
+      this.child.add(child);
+      this.valueOfAllChild?.add(child.value);
+      child.parent! = this;
+    }
+  }

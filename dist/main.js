@@ -1,18 +1,23 @@
 "use strict";
-// import {sudoku} from "./sudoku";
 var _a, _b, _c, _d, _e;
+// import {sudoku} from "./sudoku";
 // export module main{
 window.addEventListener("contextmenu", function (e) { return e.preventDefault(); });
 var boardArray = new Array(81);
 var size = 9;
 var symbol = 1;
 var divBoard = document.createElement('div');
-(_a = document.querySelector('body')) === null || _a === void 0 ? void 0 : _a.addEventListener("keydown", function (event) {
+(_a = document.querySelector('body')) === null || _a === void 0 ? void 0 : _a.addEventListener("keyup", function (event) {
     var _a;
     var keyCode = event.keyCode;
     if (keyCode >= 49 && keyCode <= 57) {
         (_a = document.getElementById("chose" + (keyCode - 48))) === null || _a === void 0 ? void 0 : _a.click();
     }
+    if (keyCode == 71) {
+        boardGenerateSecond();
+        displayBoard(boardArray);
+    }
+    console.log(keyCode);
 });
 var mistakesPanel = document.createElement('div');
 (_b = document.querySelector('body')) === null || _b === void 0 ? void 0 : _b.append(mistakesPanel);
@@ -94,8 +99,7 @@ var _loop_2 = function (i) {
 for (var i = 0; i < size; i++) {
     _loop_2(i);
 }
-boardGenerateSecond();
-displayBoard(boardArray);
+//boardGenerateSecond();
 function checkBoard(board, size) {
     for (var i = 0, conuterI = 1; i < size * size; i += 3, conuterI++) {
         var numbersCheck = new Array(10);
@@ -193,23 +197,22 @@ function boardGenerate(board, size) {
     }
 }
 function boardGenerateSecond() {
+    console.log("Start funct");
     var exception = [];
     var randomNumberLast;
     var pointOne = 0;
     var pointTwo = 0;
-    for (var i = 0, counter = 0; i < size * size; i++) {
-        exception.slice(0, exception.length);
+    for (var i = 0, counter = 0; i < 9; i++) {
+        exception = [];
         do {
-            randomNumberLast = randomBetween(0, 10, exception);
-            boardArray[i] = randomNumberLast;
-            exception.push(randomNumberLast);
-            if (i > pointTwo) {
+            if (i > pointTwo && pointTwo != 0) {
                 pointOne = 0;
                 pointTwo = 0;
             }
             if (checkArrayExceptionSum(exception)) {
-                if (pointOne == 0) {
+                if (pointOne <= 0) {
                     pointOne = i - 2;
+                    console.log("Aboba");
                     pointTwo = i;
                 }
                 else {
@@ -217,13 +220,17 @@ function boardGenerateSecond() {
                 }
                 i = pointOne;
                 boardArray[i] = 0;
-                console.log(exception);
+                // console.log(exception);
                 break;
             }
             ;
-            console.log(i);
+            randomNumberLast = randomBetween(0, 10, exception);
+            boardArray[i] = randomNumberLast;
+            exception.push(randomNumberLast);
+            //console.log(i);
         } while (!checkBoard(boardArray, size));
     }
+    console.log('End func');
 }
 function randomBetween(min, max, exception) {
     var randomNumber;
@@ -246,4 +253,55 @@ function checkArrayExceptionSum(array) {
     }
     return sum == 45;
 }
+//##############################backtacking algoritm
+function backtrackingSolution() {
+    var main = new TreeNode(0);
+    var optionsOfValue;
+    var currentTreeNode = main;
+    var lastAddedValue = main;
+    for (var i = 0; i < size * size; i++) {
+        optionsOfValue = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        optionsOfValue = differceFillOptionsOfValue(optionsOfValue, currentTreeNode.valueOfAllChild);
+        do {
+            if (optionsOfValue.length <= 0) {
+                currentTreeNode.parent = currentTreeNode;
+                boardArray[i] = 0;
+                break;
+            }
+            var randomNumber = Math.floor(Math.random() * optionsOfValue.length);
+            var randomValue = optionsOfValue[randomNumber];
+            optionsOfValue = optionsOfValue.slice(randomNumber, 1);
+            boardArray[i] = randomValue;
+            lastAddedValue = new TreeNode(randomValue);
+            currentTreeNode.addChild(lastAddedValue);
+        } while (!checkBoard(boardArray, size));
+        if (boardArray[i] != 0)
+            currentTreeNode = lastAddedValue;
+    }
+}
+function differceFillOptionsOfValue(array, hashset) {
+    var temp = new Set();
+    for (var i = 0; i < array.length; i++) {
+        temp.add(array[i]);
+    }
+    temp = temp.difference(hashset);
+    array = [];
+    temp.forEach(function (item) {
+        array.push(item);
+    });
+    return array;
+}
+var TreeNode = /** @class */ (function () {
+    function TreeNode(value) {
+        this.value = value;
+    }
+    TreeNode.prototype.addChild = function (child) {
+        var _a;
+        this.child.add(child);
+        (_a = this.valueOfAllChild) === null || _a === void 0 ? void 0 : _a.add(child.value);
+        child.parent = this;
+    };
+    return TreeNode;
+}());
+//##########################################
 //}
