@@ -13,9 +13,9 @@ var divBoard = document.createElement('div');
         (_a = document.getElementById("chose".concat(keyCode - 48))) === null || _a === void 0 ? void 0 : _a.click();
     }
     if (keyCode == 71) {
-        for (var i = 0; i < boardArray.length; i++) {
-            boardArray[i] = 0;
-        }
+        // for (let i = 0; i < boardArray.length; i++) {
+        //   boardArray[i] = 0;
+        // }
         backtrackingSolution();
         displayBoard(boardArray);
     }
@@ -100,6 +100,8 @@ var _loop_2 = function (i) {
 for (var i = 0; i < size; i++) {
     _loop_2(i);
 }
+allZero();
+console.log(boardArray);
 function checkBoard(board, size) {
     for (var i = 0, conuterI = 1; i < size * size; i += 3, conuterI++) {
         var numbersCheck = new Array(10);
@@ -153,98 +155,19 @@ function zeroFill(array) {
     }
     return array;
 }
-function boardGenerate(board, size) {
-    var heapOfNumbers = new Array(81);
-    for (var i = 0; i < heapOfNumbers.length;) {
-        for (var j = 1; j <= 9; j++) {
-            heapOfNumbers[i] = j;
-            i++;
-        }
-    }
-    var randomNumber;
-    var lengthOfHeap = 80;
-    for (var i = 0; i < board.length; i++) {
-        do {
-            randomNumber = Math.floor(Math.random() * (lengthOfHeap + 1));
-            board[i] = heapOfNumbers[randomNumber];
-        } while (!checkBoard(board, size));
-        heapOfNumbers[randomNumber] = heapOfNumbers[lengthOfHeap];
-        heapOfNumbers[lengthOfHeap] = 0;
-        lengthOfHeap--;
-        console.log(i);
-    }
-}
-function boardGenerateSecond() {
-    console.log("Start funct");
-    var exception = [];
-    var randomNumberLast;
-    var pointOne = 0;
-    var pointTwo = 0;
-    for (var i = 0, counter = 0; i < 9; i++) {
-        exception = [];
-        do {
-            if (i > pointTwo && pointTwo != 0) {
-                pointOne = 0;
-                pointTwo = 0;
-            }
-            if (checkArrayExceptionSum(exception)) {
-                if (pointOne <= 0) {
-                    pointOne = i - 2;
-                    console.log("Aboba");
-                    pointTwo = i;
-                }
-                else {
-                    pointOne -= 2;
-                }
-                i = pointOne;
-                boardArray[i] = 0;
-                // console.log(exception);
-                break;
-            }
-            ;
-            randomNumberLast = randomBetween(0, 10, exception);
-            boardArray[i] = randomNumberLast;
-            exception.push(randomNumberLast);
-            //console.log(i);
-        } while (!checkBoard(boardArray, size));
-    }
-    console.log('End func');
-}
-function randomBetween(min, max, exception) {
-    var randomNumber;
-    do {
-        randomNumber = Math.floor((Math.random() * (max - min) + min));
-    } while (searchNumberArray(exception, randomNumber));
-    return randomNumber;
-}
-function searchNumberArray(array, searchedNumber) {
-    for (var i = 0; i < array.length; i++) {
-        if (array[i] == searchedNumber)
-            return true;
-    }
-    return false;
-}
-function checkArrayExceptionSum(array) {
-    var sum = 0;
-    for (var i = 0; i < array.length; i++) {
-        sum += array[i];
-    }
-    return sum == 45;
-}
 //##############################backtacking algoritm
-function backtrackingSolution() {
-    var main = new TreeNode(0, false);
+function backtrackingGeneration() {
+    var main = new TreeNode(0, false, false);
     var optionsOfValue;
     var currentTreeNode = main;
     var lastAddedValue = main;
-    for (var i = 0, counter = 0; i < size * size; i++) {
+    for (var i = 0; i < size * size; i++) {
         optionsOfValue = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         optionsOfValue = differceFillOptionsOfValue(optionsOfValue, currentTreeNode.getValueOfChild());
         do {
             if (optionsOfValue.length == 0) {
                 currentTreeNode = currentTreeNode.parent;
                 boardArray[i] = 0;
-                counter++;
                 break;
             }
             var randomNumber = Math.floor(Math.random() * (optionsOfValue.length));
@@ -252,7 +175,7 @@ function backtrackingSolution() {
             optionsOfValue.splice(randomNumber, 1);
             boardArray[i] = randomValue;
             if (randomValue != 0) {
-                lastAddedValue = new TreeNode(randomValue, true);
+                lastAddedValue = new TreeNode(randomValue, true, false);
                 currentTreeNode.addChild(lastAddedValue);
             }
         } while (!checkBoard(boardArray, size) && boardArray[i] != 0);
@@ -260,6 +183,62 @@ function backtrackingSolution() {
             currentTreeNode = lastAddedValue;
         else
             i -= 2;
+    }
+}
+function allZero() {
+    for (var i = 0; i < boardArray.length; i++) {
+        boardArray[i] = 0;
+    }
+}
+function backtrackingSolution() {
+    console.log(boardArray);
+    var main = new TreeNode(0, false, false);
+    var optionsOfValue;
+    var currentTreeNode = main;
+    var lastAddedValue = main;
+    for (var i = 0; i < size * size; i++) {
+        optionsOfValue = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        // if(currentTreeNode!=undefined)
+        optionsOfValue = differceFillOptionsOfValue(optionsOfValue, currentTreeNode.getValueOfChild());
+        if (boardArray[i] != 0) {
+            lastAddedValue = new TreeNode(boardArray[i], true, true);
+            currentTreeNode.addChild(lastAddedValue);
+            currentTreeNode = lastAddedValue;
+            console.log('must be: ' + i + ' ' + boardArray[i]);
+            // console.log(i + "\t" + boardArray[i]);
+        }
+        else {
+            do {
+                if (optionsOfValue.length == 0) {
+                    boardArray[i] = 0;
+                    while (currentTreeNode.mustBe) {
+                        currentTreeNode = currentTreeNode.parent;
+                        i--;
+                        console.log('while');
+                    }
+                    i--;
+                    boardArray[i] = 0;
+                    currentTreeNode = currentTreeNode.parent;
+                    //console.log(currentTreeNode);
+                    // console.log('aboba');
+                    break;
+                }
+                var randomNumber = Math.floor(Math.random() * (optionsOfValue.length));
+                var randomValue = optionsOfValue[randomNumber];
+                optionsOfValue.splice(randomNumber, 1);
+                boardArray[i] = randomValue;
+                if (randomValue != 0) {
+                    lastAddedValue = new TreeNode(randomValue, true, false);
+                    currentTreeNode.addChild(lastAddedValue);
+                }
+            } while (!checkBoard(boardArray, size) && boardArray[i] != 0);
+            if (boardArray[i] != 0 && optionsOfValue.length != 0)
+                currentTreeNode = lastAddedValue;
+            else
+                i--;
+        }
+        console.log(boardArray[i] + ' : ' + i);
+        // console.log(boardArray[i]);
     }
 }
 function differceFillOptionsOfValue(array, hashset) {
@@ -272,12 +251,13 @@ function differceFillOptionsOfValue(array, hashset) {
     return array;
 }
 var TreeNode = /** @class */ (function () {
-    function TreeNode(value, parentExist) {
+    function TreeNode(value, parentExist, mustBe) {
         this.value = value;
         this.child = new Set();
         this.valueOfAllChild = new Set();
         if (parentExist)
-            this.parent = new TreeNode(0, false);
+            this.parent = new TreeNode(0, false, false);
+        this.mustBe = mustBe;
     }
     TreeNode.prototype.addChild = function (child) {
         this.child.add(child);

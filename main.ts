@@ -13,9 +13,9 @@
       document.getElementById(`chose${keyCode-48}`)?.click();
     }
     if(keyCode==71){
-      for (let i = 0; i < boardArray.length; i++) {
-        boardArray[i] = 0;
-      }
+      // for (let i = 0; i < boardArray.length; i++) {
+      //   boardArray[i] = 0;
+      // }
       backtrackingSolution();
       displayBoard(boardArray);
     }
@@ -85,6 +85,9 @@
     }
   }
 
+  allZero();
+  console.log(boardArray);
+
   function checkBoard(board:number[], size:number):boolean{
     for (let i = 0, conuterI = 1; i < size*size; i+=3, conuterI++) {
       let numbersCheck = new Array<number>(10);
@@ -130,101 +133,19 @@
     return array;
   }
 
-  function boardGenerate(board:number[], size:number):void{
-    let heapOfNumbers = new Array<number>(81);
-    for (let i = 0; i < heapOfNumbers.length; ) {
-      for (let j = 1; j <= 9; j++) {
-        heapOfNumbers[i] = j;
-        i++;
-      }
-    }
-    let randomNumber:number;
-    let lengthOfHeap:number = 80;
-    for (let i = 0; i < board.length; i++) {
-      do {
-        randomNumber = Math.floor(Math.random()*(lengthOfHeap+1));
-        board[i] = heapOfNumbers[randomNumber];
-      } while (!checkBoard(board,size));
-      heapOfNumbers[randomNumber] = heapOfNumbers[lengthOfHeap];
-      heapOfNumbers[lengthOfHeap] = 0;
-      lengthOfHeap--;
-      console.log(i);
-    }
-  }
-
-  function boardGenerateSecond():void{
-    console.log("Start funct");
-    let exception:number[] = [];
-    let randomNumberLast:number;
-    let pointOne:number = 0;
-    let pointTwo:number = 0;
-    for (let i = 0, counter = 0; i < 9; i++) {
-      exception = [];
-      do {
-        if(i>pointTwo&&pointTwo!=0){
-          pointOne = 0;
-          pointTwo = 0;
-        }
-        if(checkArrayExceptionSum(exception)){
-          if(pointOne<=0){
-            pointOne = i-2;
-            console.log("Aboba");
-            pointTwo = i;
-          }
-          else{
-            pointOne-=2;
-          }
-          i = pointOne;
-          boardArray[i] = 0;
-          // console.log(exception);
-          break;
-        };
-        randomNumberLast = randomBetween(0, 10, exception);
-        boardArray[i] = randomNumberLast;
-        exception.push(randomNumberLast);
-        //console.log(i);
-      } while (!checkBoard(boardArray,size));
-    }
-    console.log('End func');
-  }
-
-  function randomBetween(min:number,max:number,exception:number[]):number{
-    let randomNumber:number;
-    do {
-      randomNumber = Math.floor((Math.random()*(max-min)+min));
-    } while (searchNumberArray(exception,randomNumber));
-    return randomNumber;
-  }
-
-  function searchNumberArray(array:number[],searchedNumber:number):boolean{
-    for (let i = 0; i < array.length; i++) {
-      if(array[i]==searchedNumber) return true;
-    }
-    return false;
-  }
-
-  function checkArrayExceptionSum(array:number[]):boolean{
-    let sum:number = 0;
-    for (let i = 0; i < array.length; i++) {
-      sum+=array[i];
-    }
-    return sum==45;
-  }
-
   //##############################backtacking algoritm
-  function backtrackingSolution():void{
-    let main:TreeNode = new TreeNode(0,false);
+  function backtrackingGeneration():void{
+    let main:TreeNode = new TreeNode(0,false,false);
     let optionsOfValue:number[];
     let currentTreeNode:TreeNode = main;
     let lastAddedValue:TreeNode = main;
-    for (let i = 0, counter = 0; i < size*size; i++) {
+    for (let i = 0; i < size*size; i++) {
       optionsOfValue = [1,2,3,4,5,6,7,8,9];
       optionsOfValue = differceFillOptionsOfValue(optionsOfValue, currentTreeNode.getValueOfChild());
       do{
         if(optionsOfValue.length == 0){
           currentTreeNode = currentTreeNode.parent!;
           boardArray[i] = 0;
-          counter++;
           break;
         }
         let randomNumber:number = Math.floor(Math.random()*(optionsOfValue.length));
@@ -232,12 +153,73 @@
         optionsOfValue.splice(randomNumber,1);
         boardArray[i] = randomValue;
         if(randomValue!=0){
-          lastAddedValue = new TreeNode(randomValue,true);
+          lastAddedValue = new TreeNode(randomValue,true,false);
           currentTreeNode.addChild(lastAddedValue);
         }
       }while (!checkBoard(boardArray,size)&&boardArray[i]!=0);
       if(boardArray[i]!=0) currentTreeNode = lastAddedValue;
       else i-=2;
+    }
+  }
+
+  function allZero():void{
+    for (let i = 0; i < boardArray.length; i++) {
+      boardArray[i]=0;
+    }
+  }
+
+  function backtrackingSolution():void{
+    console.log(boardArray);
+    let main:TreeNode = new TreeNode(0,false,false);
+    let optionsOfValue:number[];
+    let currentTreeNode:TreeNode = main;
+    let lastAddedValue:TreeNode = main;
+    let mustBeSet = new Set<number>();
+    for (let i = 0; i < boardArray.length; i++) {
+      if(boardArray[i]!=0) mustBeSet.add(i);
+    }
+    for (let i = 0; i < size*size; i++) {
+      
+      optionsOfValue = [1,2,3,4,5,6,7,8,9];
+      // if(currentTreeNode!=undefined)
+      optionsOfValue = differceFillOptionsOfValue(optionsOfValue, currentTreeNode.getValueOfChild());
+      if(boardArray[i]!=0){
+        lastAddedValue = new TreeNode(boardArray[i],true,true)
+        currentTreeNode.addChild(lastAddedValue);
+        currentTreeNode = lastAddedValue;
+        console.log('must be: ' + i + ' : ' + boardArray[i]);
+        // console.log(i + "\t" + boardArray[i]);
+      }
+      else{
+        do{
+          if(optionsOfValue.length == 0){
+            boardArray[i] = 0;
+            while (currentTreeNode.mustBe){
+              currentTreeNode = currentTreeNode.parent!;
+              i--;
+              console.log('while')
+            }
+            i--;
+            boardArray[i] = 0;
+            currentTreeNode = currentTreeNode.parent!;
+            //console.log(currentTreeNode);
+            // console.log('aboba');
+            break;
+          }
+          let randomNumber:number = Math.floor(Math.random()*(optionsOfValue.length));
+          let randomValue:number = optionsOfValue[randomNumber];
+          optionsOfValue.splice(randomNumber,1);
+          boardArray[i] = randomValue;
+          if(randomValue!=0){
+            lastAddedValue = new TreeNode(randomValue,true,false);
+            currentTreeNode.addChild(lastAddedValue);
+          }
+        }while (!checkBoard(boardArray,size)&&boardArray[i]!=0);
+        if(boardArray[i]!=0&&optionsOfValue.length != 0) currentTreeNode = lastAddedValue;
+        else i--;
+      }
+      console.log(boardArray[i] + ' : ' + i);
+      // console.log(boardArray[i]);
     }
   }
 
@@ -255,11 +237,13 @@
     parent?: TreeNode;
     value: number;
     valueOfAllChild: Set<number>;
-    constructor(value:number, parentExist:boolean){
+    mustBe: boolean;
+    constructor(value:number, parentExist:boolean, mustBe:boolean){
       this.value = value;
       this.child = new Set();
       this.valueOfAllChild = new Set<number>();
-      if(parentExist) this.parent = new TreeNode(0,false);
+      if(parentExist) this.parent = new TreeNode(0,false,false);
+      this.mustBe = mustBe;
     }
     addChild(child:TreeNode){
       this.child.add(child);
