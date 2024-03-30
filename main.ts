@@ -13,6 +13,9 @@
       document.getElementById(`chose${keyCode-48}`)?.click();
     }
     if(keyCode==71){
+      for (let i = 0; i < boardArray.length; i++) {
+        boardArray[i] = 0;
+      }
       backtrackingSolution();
       displayBoard(boardArray);
     }
@@ -210,50 +213,34 @@
 
   //##############################backtacking algoritm
   function backtrackingSolution():void{
-    let main:TreeNode = new TreeNode(0);
+    let main:TreeNode = new TreeNode(0,false);
     let optionsOfValue:number[];
     let currentTreeNode:TreeNode = main;
     let lastAddedValue:TreeNode = main;
     for (let i = 0, counter = 0; i < size*size; i++) {
       optionsOfValue = [1,2,3,4,5,6,7,8,9];
-      optionsOfValue = differceFillOptionsOfValue(optionsOfValue, currentTreeNode.valueOfAllChild);
+      optionsOfValue = differceFillOptionsOfValue(optionsOfValue, currentTreeNode.getValueOfChild());
       do{
         if(optionsOfValue.length == 0){
-          currentTreeNode = currentTreeNode.parent;
+          currentTreeNode = currentTreeNode.parent!;
           boardArray[i] = 0;
-          //console.log('aboba');
           counter++;
           break;
         }
         let randomNumber:number = Math.floor(Math.random()*(optionsOfValue.length));
         let randomValue:number = optionsOfValue[randomNumber];
-        optionsOfValue.splice(randomNumber,randomNumber);
+        optionsOfValue.splice(randomNumber,1);
         boardArray[i] = randomValue;
-        lastAddedValue = new TreeNode(randomValue);
-        currentTreeNode.addChild(lastAddedValue);
-        //console.log(randomValue);
-        //console.log(optionsOfValue);
-        //console.log(randomNumber);
+        if(randomValue!=0){
+          lastAddedValue = new TreeNode(randomValue,true);
+          currentTreeNode.addChild(lastAddedValue);
+        }
       }while (!checkBoard(boardArray,size)&&boardArray[i]!=0);
       if(boardArray[i]!=0) currentTreeNode = lastAddedValue;
       else i-=2;
-      console.log(i);
-      //if(counter>=1000) board;
-      // console.log(counter);
     }
   }
 
-  // for (let i = 0; i < 20; i++) {
-  //   console.log(Math.floor(Math.random()*(9)))
-  // }
-  
-
-  function allBoardCheck():boolean{
-    boardArray.forEach( item => {
-      if(boardArray[item]==0) return false;
-    });
-    return true;
-  }
 
   function differceFillOptionsOfValue(array:number[], hashset:Set<number>):number[]{
     if(hashset == undefined) return array;
@@ -264,17 +251,25 @@
   }
 
   class TreeNode{
-    child!: Set<TreeNode>;
-    parent!: TreeNode;
-    value!: number;
-    valueOfAllChild!: Set<number>;
-    constructor(value:number){
+    child: Set<TreeNode>;
+    parent?: TreeNode;
+    value: number;
+    valueOfAllChild: Set<number>;
+    constructor(value:number, parentExist:boolean){
       this.value = value;
       this.child = new Set();
+      this.valueOfAllChild = new Set<number>();
+      if(parentExist) this.parent = new TreeNode(0,false);
     }
     addChild(child:TreeNode){
       this.child.add(child);
-      this.valueOfAllChild?.add(child.value);
-      child.parent! = this;
+      child.parent = this;
+      this.valueOfAllChild.add(child.value);
+    }
+    addValueOfChild(value:number){
+      this.valueOfAllChild.add(value);
+    }
+    getValueOfChild():Set<number>{
+      return this.valueOfAllChild;
     }
   }

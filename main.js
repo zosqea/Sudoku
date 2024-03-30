@@ -13,6 +13,9 @@ var divBoard = document.createElement('div');
         (_a = document.getElementById("chose".concat(keyCode - 48))) === null || _a === void 0 ? void 0 : _a.click();
     }
     if (keyCode == 71) {
+        for (var i = 0; i < boardArray.length; i++) {
+            boardArray[i] = 0;
+        }
         backtrackingSolution();
         displayBoard(boardArray);
     }
@@ -230,49 +233,34 @@ function checkArrayExceptionSum(array) {
 }
 //##############################backtacking algoritm
 function backtrackingSolution() {
-    var main = new TreeNode(0);
+    var main = new TreeNode(0, false);
     var optionsOfValue;
     var currentTreeNode = main;
     var lastAddedValue = main;
     for (var i = 0, counter = 0; i < size * size; i++) {
         optionsOfValue = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-        optionsOfValue = differceFillOptionsOfValue(optionsOfValue, currentTreeNode.valueOfAllChild);
+        optionsOfValue = differceFillOptionsOfValue(optionsOfValue, currentTreeNode.getValueOfChild());
         do {
             if (optionsOfValue.length == 0) {
                 currentTreeNode = currentTreeNode.parent;
                 boardArray[i] = 0;
-                //console.log('aboba');
                 counter++;
                 break;
             }
             var randomNumber = Math.floor(Math.random() * (optionsOfValue.length));
             var randomValue = optionsOfValue[randomNumber];
-            optionsOfValue.splice(randomNumber, randomNumber);
+            optionsOfValue.splice(randomNumber, 1);
             boardArray[i] = randomValue;
-            lastAddedValue = new TreeNode(randomValue);
-            currentTreeNode.addChild(lastAddedValue);
-            //console.log(randomValue);
-            //console.log(optionsOfValue);
-            //console.log(randomNumber);
+            if (randomValue != 0) {
+                lastAddedValue = new TreeNode(randomValue, true);
+                currentTreeNode.addChild(lastAddedValue);
+            }
         } while (!checkBoard(boardArray, size) && boardArray[i] != 0);
         if (boardArray[i] != 0)
             currentTreeNode = lastAddedValue;
         else
             i -= 2;
-        console.log(i);
-        //if(counter>=1000) board;
-        // console.log(counter);
     }
-}
-// for (let i = 0; i < 20; i++) {
-//   console.log(Math.floor(Math.random()*(9)))
-// }
-function allBoardCheck() {
-    boardArray.forEach(function (item) {
-        if (boardArray[item] == 0)
-            return false;
-    });
-    return true;
 }
 function differceFillOptionsOfValue(array, hashset) {
     if (hashset == undefined)
@@ -284,15 +272,23 @@ function differceFillOptionsOfValue(array, hashset) {
     return array;
 }
 var TreeNode = /** @class */ (function () {
-    function TreeNode(value) {
+    function TreeNode(value, parentExist) {
         this.value = value;
         this.child = new Set();
+        this.valueOfAllChild = new Set();
+        if (parentExist)
+            this.parent = new TreeNode(0, false);
     }
     TreeNode.prototype.addChild = function (child) {
-        var _a;
         this.child.add(child);
-        (_a = this.valueOfAllChild) === null || _a === void 0 ? void 0 : _a.add(child.value);
         child.parent = this;
+        this.valueOfAllChild.add(child.value);
+    };
+    TreeNode.prototype.addValueOfChild = function (value) {
+        this.valueOfAllChild.add(value);
+    };
+    TreeNode.prototype.getValueOfChild = function () {
+        return this.valueOfAllChild;
     };
     return TreeNode;
 }());
